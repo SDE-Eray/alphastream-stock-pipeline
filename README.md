@@ -1,43 +1,51 @@
-AlphaStream: Automated Financial Data Pipeline
-A Cloud-Native ETL Pipeline for Real-Time Stock Volatility Analysis
+# 🚀 AlphaStream: Automated Financial Data Pipeline
+![Python](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python&logoColor=white)
+![GCP](https://img.shields.io/badge/Google_Cloud-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white)
+![BigQuery](https://img.shields.io/badge/BigQuery-Google_Data_Warehouse-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white)
+![Looker](https://img.shields.io/badge/Looker_Studio-Visuals-4285F4?style=for-the-badge&logo=google-looker-studio&logoColor=white)
 
-Project Overview
-This project automates the ingestion, transformation, and visualization of historical stock market data. It utilizes a Serverless Architecture on Google Cloud Platform (GCP) to fetch data from Yahoo Finance, process it through a multi-layer storage strategy, and deliver interactive insights via Looker Studio.
+**A Cloud-Native ETL Pipeline for Real-Time Stock Volatility Analysis**
 
-Tech Stack
-Language: Python 3.11 (Pandas, yfinance, functions-framework)
+---
 
-Infrastructure: GCP Cloud Functions (Gen 2), Cloud Scheduler, Artifact Registry
+## 📌 Project Overview
+This project automates the ingestion, transformation, and visualization of historical stock market data. It utilizes a **Serverless Architecture** on Google Cloud Platform (GCP) to fetch data from Yahoo Finance, process it through a multi-layer storage strategy, and deliver interactive insights via Looker Studio.
 
-Storage: Google Cloud Storage (GCS) - Staging Layer
+---
 
-Database: Google BigQuery (Standard SQL)
+## 🏗 Architecture & Data Flow
+```mermaid
+graph LR
+    A[Yahoo Finance API] -->|Fetch Data| B(Cloud Function)
+    subgraph GCP Environment
+        B -->|Raw Parquet| C[(GCS Staging Bucket)]
+        C -->|Load Job| D[(BigQuery Warehouse)]
+        D -->|SQL View| E[Looker Studio Dashboard]
+    end
+    F[Cloud Scheduler] -->|Trigger Daily| B
+    style B fill:#f9f,stroke:#333,stroke-width:2px
+    style D fill:#bbf,stroke:#333,stroke-width:2px
 
-Visualization: Looker Studio
+Ingestion: Python Cloud Function triggers daily via Scheduler.
 
-Architecture & Data Flow
-Ingestion (Extract): A Python-based Cloud Function is triggered daily via Cloud Scheduler (Cron: 0 9 * * *).
+Staging: Saves raw data to GCS (Parquet) for fault tolerance.
 
-Staging (Load): Raw data is converted to Apache Parquet format and stored in a GCS Bucket. This "decouples" the ingestion from the database for better fault tolerance.
+Warehouse: Loads data into BigQuery with schema enforcement.
 
-Warehouse (Transform): Data is loaded into BigQuery using a WRITE_TRUNCATE policy to ensure idempotency.
+Analytics: Visualizes volatility trends in Looker Studio.
 
-Analytics Layer: A SQL View calculates a 7-Day Moving Average using Window Functions to provide trend analysis.
+🛠 Tech Stack
+Language: Python 3.11 (Pandas, yfinance)
 
-Key Engineering Decisions
-Why Parquet? Chose Parquet over CSV to preserve schema (data types) and optimize storage costs and query performance in BigQuery.
+Compute: Cloud Functions (Gen 2)
 
-Security (IAM): Implemented a dedicated Service Account with the "Principle of Least Privilege," ensuring the ingestion bot only has access to specific project resources.
+Orchestration: Cloud Scheduler (Cron: 0 9 * * *)
 
-Idempotency: The pipeline is designed to be re-run safely. If a job fails, re-running it will not result in duplicate data, thanks to the WRITE_TRUNCATE configuration.
+Storage: GCS (Bronze Layer) & BigQuery (Gold Layer)
 
-Serverless Scaling: Using Cloud Functions ensures "Scale-to-Zero" cost efficiency—we only pay for the exact seconds the data is being processed.
+🔑 Key Engineering Decisions
+🛡️ Security: Used a dedicated Service Account with granular IAM permissions (principle of least privilege).
 
-Final Dashboard
-The final output is an interactive dashboard showing:
+💾 Format: Chose Parquet over CSV to preserve data types (schema enforcement) and reduce storage costs.
 
-Daily Closing Prices vs. 7-Day Moving Averages.
-
-Custom Volatility Index (High-Low Spread).
-
-Monthly Aggregated Trends with linear interpolation for weekend gaps.
+🔄 Idempotency: Pipeline uses WRITE_TRUNCATE strategies to prevent duplicate data if the job is re-run.
