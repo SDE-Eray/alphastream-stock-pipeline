@@ -1,0 +1,35 @@
+# --- Virtual Environments ---
+venv/
+.venv/
+env/
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
+
+# --- Secrets & Config ---
+.env
+.env.*
+service-account.json
+*.json_key
+secrets/
+
+# --- IDEs ---
+.vscode/
+.idea/
+*.swp
+
+# --- Data & Artifacts ---
+data/*.parquet
+data/*.csv
+!data/mock_volatility.json  # Allow specifically this mock file
+logs/
+/tmp/
